@@ -33,6 +33,8 @@ THEMES = {
                     ink=(255, 255, 255), soft=(170, 220, 190), grid=False),
     "teen":   dict(name="TEEN TALK", bg1=(90, 30, 70), bg2=(40, 25, 80), accent=(255, 120, 170),
                    ink=(255, 255, 255), soft=(230, 180, 210), grid=False),
+    "english": dict(name="ENGLISH MADE EASY", bg1=(105, 48, 28), bg2=(55, 28, 70), accent=(255, 210, 110),
+                    ink=(255, 255, 255), soft=(240, 205, 175), grid=False),
 }
 
 # ---------- easing ----------
