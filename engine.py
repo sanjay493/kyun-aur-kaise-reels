@@ -33,6 +33,8 @@ THEMES = {
                     ink=(255, 255, 255), soft=(170, 220, 190), grid=False),
     "teen":   dict(name="TEEN TALK", bg1=(90, 30, 70), bg2=(40, 25, 80), accent=(255, 120, 170),
                    ink=(255, 255, 255), soft=(230, 180, 210), grid=False),
+    "study":  dict(name="STUDY SMART", bg1=(20, 55, 95), bg2=(35, 30, 75), accent=(110, 215, 255),
+                   ink=(255, 255, 255), soft=(175, 210, 240), grid=False),
     "english": dict(name="ENGLISH MADE EASY", bg1=(105, 48, 28), bg2=(55, 28, 70), accent=(255, 210, 110),
                     ink=(255, 255, 255), soft=(240, 205, 175), grid=False),
 }
@@ -80,13 +82,17 @@ def chrome(d, theme, frac):
     text_c(d, (W / 2, 215), HANDLE, font(30, "reg"), theme["soft"])
 
 # ---------- character: "Chintu" ----------
-def character(d, cx, cy, mouth, blink, theme, s=1.0):
+def character(d, cx, cy, mouth, blink, theme, s=1.0, talk=0.0):
+    """talk (0-1): how animated Chintu is right now; lifts the eyebrows and nods the head slightly."""
     skin, hair, shirt = (240, 190, 150), (35, 25, 25), (250, 250, 255)
     r = 95 * s
+    body_cy = cy
+    cy = cy - 6 * s * talk  # small nod up while speaking (body stays put)
     # body / uniform
-    d.rounded_rectangle([cx - 120 * s, cy + 70 * s, cx + 120 * s, cy + 260 * s], 60 * s, fill=shirt)
-    d.polygon([(cx - 30 * s, cy + 80 * s), (cx, cy + 135 * s), (cx + 30 * s, cy + 80 * s)], fill=theme["accent"])  # tie/collar
-    d.rectangle([cx - 22 * s, cy + 60 * s, cx + 22 * s, cy + 90 * s], fill=skin)
+    by = body_cy
+    d.rounded_rectangle([cx - 120 * s, by + 70 * s, cx + 120 * s, by + 260 * s], 60 * s, fill=shirt)
+    d.polygon([(cx - 30 * s, by + 80 * s), (cx, by + 135 * s), (cx + 30 * s, by + 80 * s)], fill=theme["accent"])  # tie/collar
+    d.rectangle([cx - 22 * s, cy + 60 * s, cx + 22 * s, by + 90 * s], fill=skin)
     # head
     d.ellipse([cx - r, cy - r, cx + r, cy + r], fill=skin)
     d.chord([cx - r - 4 * s, cy - r - 12 * s, cx + r + 4 * s, cy + r * 0.55], 180, 360, fill=hair)
@@ -96,11 +102,17 @@ def character(d, cx, cy, mouth, blink, theme, s=1.0):
     for ex in (-34, 34):
         x = cx + ex * s
         if blink:
-            d.line([x - 14 * s, cy + 2 * s, x + 14 * s, cy + 2 * s], fill=(30, 30, 30), width=int(6 * s))
+            d.line([x - 14 * s, cy + 2 * s, x + 14 * s, cy + 2 * s], fill=(30, 30, 30), width=int(5 * s))
         else:
             d.ellipse([x - 15 * s, cy - 15 * s, x + 15 * s, cy + 17 * s], fill=(255, 255, 255))
             d.ellipse([x - 8 * s, cy - 7 * s, x + 8 * s, cy + 11 * s], fill=(30, 30, 30))
             d.ellipse([x - 3 * s, cy - 5 * s, x + 2 * s, cy], fill=(255, 255, 255))
+    # eyebrows: rest low, lift when talking
+    lift = 3 * s * talk
+    for ex in (-34, 34):
+        x = cx + ex * s
+        o = -1 if ex < 0 else 1  # outer end sits a touch lower than the inner end
+        d.line([(x + 14 * s * o, cy - 17 * s - lift), (x - 14 * s * o, cy - 20 * s - lift)], fill=hair, width=int(5 * s))
     d.ellipse([cx - 62 * s, cy + 22 * s, cx - 42 * s, cy + 36 * s], fill=(245, 150, 140))  # cheeks
     d.ellipse([cx + 42 * s, cy + 22 * s, cx + 62 * s, cy + 36 * s], fill=(245, 150, 140))
     # mouth
@@ -240,7 +252,9 @@ def render(module, out_path, workdir):
             c = int(t * sr); seg = aud[max(0, c - 600): c + 600]
             loud = float(np.sqrt(np.mean(seg ** 2))) if len(seg) else 0
             blink = (gt % 3.3) < 0.12
-            character(d, 170, 1640, clamp(loud * 9), blink, theme, 0.85)
+            c2 = int(max(0, t - 0.25) * sr); seg2 = aud[max(0, c2 - 3000): c2 + 3000]  # slower envelope
+            talk = clamp(float(np.sqrt(np.mean(seg2 ** 2))) * 7) if len(seg2) else 0
+            character(d, 170, 1640, clamp(loud * 9), blink, theme, 0.85, talk)
             proc.stdin.write(frame.tobytes())
         proc.stdin.close()
         if proc.wait() != 0: raise RuntimeError("ffmpeg failed on scene %d" % i)
@@ -272,5 +286,5 @@ def still(module, sc_index, t, out_png):
     chrome(d, theme, 0.4)
     words = words_of(sc.get("show", sc["say"]))
     subtitle(d, words, 2, theme)
-    character(d, 170, 1640, 0.5, False, theme, 0.85)
+    character(d, 170, 1640, 0.5, False, theme, 0.85, 1.0)
     frame.save(out_png)
