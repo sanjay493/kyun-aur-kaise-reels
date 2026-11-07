@@ -164,7 +164,7 @@ def tts(text, path):
     return s, sr
 
 def music_bed(dur, sr=24000):
-    t = np.arange(int(dur * sr)) / sr
+    t = np.arange(int(round(dur * sr))) / sr  # round: int() could drop the last sample
     chords = [[261.6, 329.6, 392.0], [220.0, 261.6, 329.6], [174.6, 220.0, 261.6], [196.0, 246.9, 293.7]]
     out = np.zeros_like(t)
     beat = 2.0
