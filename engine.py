@@ -37,6 +37,9 @@ THEMES = {
                    ink=(255, 255, 255), soft=(175, 210, 240), grid=False),
     "english": dict(name="ENGLISH MADE EASY", bg1=(105, 48, 28), bg2=(55, 28, 70), accent=(255, 210, 110),
                     ink=(255, 255, 255), soft=(240, 205, 175), grid=False),
+    # money / financial literacy: deep teal-green with a gold accent (added 8 Nov 2026)
+    "money":  dict(name="MONEY SMART", bg1=(14, 72, 58), bg2=(30, 40, 62), accent=(250, 196, 70),
+                   ink=(255, 255, 255), soft=(190, 225, 200), grid=False),
 }
 
 # ---------- easing ----------
