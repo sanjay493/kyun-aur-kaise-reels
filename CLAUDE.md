@@ -47,16 +47,14 @@ rules and quality checklist; the rules below are the ones that matter most.
 Voice model files live in `models/` and are not committed. Rendered MP4s go in `out/` and are
 not committed either.
 
-## Instagram auto-posting
+## Posting to Instagram (manual)
 
-Pushing to `main` triggers `.github/workflows/instagram.yml`, which re-renders every new
-`videos/vNNN_*.py`, uploads the MP4 to the `reels` GitHub Release and queues it in
-`docs/instagram.csv`. One queued Reel is posted at each slot: 08:00, 12:00, 17:00 and 20:00 IST,
-oldest first. So:
+The account is a personal (not Creator/Business) Instagram account, so the Instagram API can't
+post to it and Reels are uploaded by hand. After rendering, run `python publish/captions.py`:
+it writes `out/vNNN_slug_caption.txt` next to each MP4 for copy-paste.
 
-- The caption posted is exactly the text between `Caption:` and `Sources:` under the
+- The caption is exactly the text between `Caption:` and `Sources:` under the
   `## vNNN Title` heading in `docs/posts/`. Keep that format, keep it under 2,200 characters
   and 30 hashtags, and don't put anything there that shouldn't go on Instagram.
-- A video posts automatically once it's pushed, so only push videos that passed the checks above.
-- Don't edit `docs/instagram.csv`; the workflow owns it. `python publish/instagram.py status`
-  shows the queue.
+- On Windows, `engine.py` uses the fonts in `fonts/` and ffmpeg must be on PATH
+  (`winget install Gyan.FFmpeg`).

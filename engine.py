@@ -20,6 +20,9 @@ def font(size, kind="bold"):
             "semi": FD + "google-fonts/Poppins-SemiBold.ttf",
             "reg": FD + "google-fonts/Poppins-Medium.ttf",
             "sym": FD + "dejavu/DejaVuSans-Bold.ttf"}[kind]
+    local = os.path.join(HERE, "fonts", os.path.basename(path))  # Windows/macOS: fonts/ next to engine.py
+    if not os.path.exists(path) and os.path.exists(local):
+        path = local
     if not os.path.exists(path):
         path = FD + "dejavu/DejaVuSans-Bold.ttf"
     return ImageFont.truetype(path, size)
