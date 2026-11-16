@@ -62,3 +62,7 @@ v035,rendered,maths,9,Is 0.999... less than 1? (0.999... = 1; recurring decimal 
 v036,rendered,science,8,How one spoon of curd turns milk into curd (Lactobacillus; lactose to lactic acid)
 v037,rendered,teen,,"Nervous before speaking? Say ""I'm excited"" (reappraising nerves as excitement)"
 v038,rendered,money,,Is ₹100 in your gullak still ₹100? (inflation and purchasing power)
+v039,rendered,english,6,"Fewer or less? (fewer for things you can count, less for things you can't)"
+v040,rendered,science,7,Why iron rusts (needs both oxygen and water; iron oxide; paint/grease/galvanisation)
+v041,rendered,safe,,"AI voice-clone ""relative in trouble"" call: hang up and call back on the saved number"
+v042,rendered,money,8,"₹100 at 10% for 3 years: simple vs compound interest (₹130 vs ₹133.10)"
