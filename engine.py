@@ -91,8 +91,9 @@ def chrome(d, theme, frac):
     text_c(d, (W / 2, 215), HANDLE, font(30, "reg"), theme["soft"])
 
 # ---------- character: "Chintu" ----------
-def character(d, cx, cy, mouth, blink, theme, s=1.0, talk=0.0):
-    """talk (0-1): how animated Chintu is right now; lifts the eyebrows and nods the head slightly."""
+def character(d, cx, cy, mouth, blink, theme, s=1.0, talk=0.0, happy=0.0):
+    """talk (0-1): how animated Chintu is right now; lifts the eyebrows and nods the head slightly.
+    happy (0-1): a closed-mouth smile with happy eyes, used once the takeaway line has been said."""
     skin, hair, shirt = (240, 190, 150), (35, 25, 25), (250, 250, 255)
     r = 95 * s
     body_cy = cy
@@ -110,7 +111,9 @@ def character(d, cx, cy, mouth, blink, theme, s=1.0, talk=0.0):
     # eyes
     for ex in (-34, 34):
         x = cx + ex * s
-        if blink:
+        if happy > 0.5 and not blink:  # happy eyes: upward arcs
+            d.arc([x - 15 * s, cy - 10 * s, x + 15 * s, cy + 16 * s], 200, 340, fill=(30, 30, 30), width=int(5 * s))
+        elif blink:
             d.line([x - 14 * s, cy + 2 * s, x + 14 * s, cy + 2 * s], fill=(30, 30, 30), width=int(5 * s))
         else:
             d.ellipse([x - 15 * s, cy - 15 * s, x + 15 * s, cy + 17 * s], fill=(255, 255, 255))
@@ -124,10 +127,14 @@ def character(d, cx, cy, mouth, blink, theme, s=1.0, talk=0.0):
         d.line([(x + 14 * s * o, cy - 17 * s - lift), (x - 14 * s * o, cy - 20 * s - lift)], fill=hair, width=int(5 * s))
     d.ellipse([cx - 62 * s, cy + 22 * s, cx - 42 * s, cy + 36 * s], fill=(245, 150, 140))  # cheeks
     d.ellipse([cx + 42 * s, cy + 22 * s, cx + 62 * s, cy + 36 * s], fill=(245, 150, 140))
-    # mouth
-    mh = 4 + 26 * mouth
-    d.rounded_rectangle([cx - 20 * s, cy + 40 * s, cx + 20 * s, cy + (40 + mh) * s], int(10 * s),
-                        fill=(120, 40, 50))
+    # mouth: talking mouth, or a smile that widens with `happy` (added 22 Nov 2026)
+    if happy > 0.05 and mouth < 0.25:
+        w, h = (18 + 14 * happy) * s, (10 + 14 * happy) * s
+        d.chord([cx - w, cy + 30 * s, cx + w, cy + 30 * s + 2 * h], 0, 180, fill=(120, 40, 50))
+    else:
+        mh = 4 + 26 * mouth
+        d.rounded_rectangle([cx - 20 * s, cy + 40 * s, cx + 20 * s, cy + (40 + mh) * s], int(10 * s),
+                            fill=(120, 40, 50))
 
 # ---------- subtitles ----------
 def words_of(s): return s.split()
@@ -263,7 +270,9 @@ def render(module, out_path, workdir):
             blink = (gt % 3.3) < 0.12
             c2 = int(max(0, t - 0.25) * sr); seg2 = aud[max(0, c2 - 3000): c2 + 3000]  # slower envelope
             talk = clamp(float(np.sqrt(np.mean(seg2 ** 2))) * 7) if len(seg2) else 0
-            character(d, 170, 1640, clamp(loud * 9), blink, theme, 0.85, talk)
+            # last scene: Chintu smiles once the takeaway has been said
+            happy = ease((t - tm["speech1"] + 0.05) / 0.2) if i == len(scenes) - 1 else 0.0
+            character(d, 170, 1640, clamp(loud * 9), blink, theme, 0.85, talk, happy)
             proc.stdin.write(frame.tobytes())
         proc.stdin.close()
         if proc.wait() != 0: raise RuntimeError("ffmpeg failed on scene %d" % i)
@@ -295,5 +304,6 @@ def still(module, sc_index, t, out_png):
     chrome(d, theme, 0.4)
     words = words_of(sc.get("show", sc["say"]))
     subtitle(d, words, 2, theme)
-    character(d, 170, 1640, 0.5, False, theme, 0.85, 1.0)
+    last = sc_index == len(module.SCENES) - 1  # preview the end-of-video smile on the last scene
+    character(d, 170, 1640, 0.0 if last else 0.5, False, theme, 0.85, 0.0 if last else 1.0, 1.0 if last else 0.0)
     frame.save(out_png)
