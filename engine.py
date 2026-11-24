@@ -43,6 +43,9 @@ THEMES = {
     # money / financial literacy: deep teal-green with a gold accent (added 8 Nov 2026)
     "money":  dict(name="MONEY SMART", bg1=(14, 72, 58), bg2=(30, 40, 62), accent=(250, 196, 70),
                    ink=(255, 255, 255), soft=(190, 225, 200), grid=False),
+    # family / home life: warm maroon-brown with a soft amber accent
+    "family": dict(name="FAMILY & HOME", bg1=(92, 40, 36), bg2=(48, 30, 66), accent=(255, 176, 90),
+                   ink=(255, 255, 255), soft=(240, 200, 185), grid=False),
 }
 
 # ---------- easing ----------
