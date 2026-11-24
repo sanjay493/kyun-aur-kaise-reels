@@ -11,7 +11,8 @@ highlighted subtitles, a recurring student character, and a soft generated music
 ./setup.sh                                   # packages + voice model (one time)
 python render.py --still videos/v001_triangle_180.py   # check layout frames -> out/*_sheet.png
 python render.py videos/v001_triangle_180.py           # render -> out/v001_triangle_180.mp4
-python render.py --all
+python render.py --new                                 # render only scripts with no MP4 yet
+python render.py --all                                 # re-render everything (slow)
 ```
 
 Needs Python 3.10+ and ffmpeg on PATH (on Windows: `winget install Gyan.FFmpeg`, and run
@@ -55,7 +56,8 @@ Useful commands:
 |---|---|
 | `python render.py --still <script>` | Layout sheet only, quick to check |
 | `python render.py <script>` | Render one video to `out/` |
-| `python render.py --all` | Render every video in `videos/` |
+| `python render.py --new` | Render only scripts that have no MP4 in `out/` yet |
+| `python render.py --all` | Re-render every script in `videos/` (overwrites existing MP4s, slow) |
 | `python publish/captions.py` | Caption files for every rendered MP4 |
 | `python publish/captions.py v038` | Print one caption |
 

@@ -2,7 +2,8 @@
 
 Usage:
     python render.py videos/v001_triangle_180.py [videos/v002_....py ...]
-    python render.py --all          # every script in videos/
+    python render.py --all          # every script in videos/ (re-renders and overwrites)
+    python render.py --new          # only scripts in videos/ that have no out/<name>.mp4 yet
     python render.py --still videos/v001_triangle_180.py   # contact sheet of key frames for checking
 
 Output goes to out/<script name>.mp4 (and out/<script name>_sheet.png for --still).
@@ -43,8 +44,14 @@ def sheet(name, mod):
 def main(argv):
     still = "--still" in argv
     argv = [a for a in argv if a != "--still"]
-    if "--all" in argv:
+    if "--all" in argv or "--new" in argv:
         argv = sorted(glob.glob(os.path.join(ROOT, "videos", "v*.py")))
+        if "--new" in sys.argv[1:] and not still:
+            argv = [p for p in argv
+                    if not os.path.exists(os.path.join(ROOT, "out", os.path.splitext(os.path.basename(p))[0] + ".mp4"))]
+            if not argv:
+                print("Nothing to render: every script already has an MP4 in out/.")
+                return 0
     if not argv:
         print(__doc__); return 1
     os.makedirs(os.path.join(ROOT, "out"), exist_ok=True)
