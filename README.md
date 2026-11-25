@@ -87,6 +87,23 @@ Series themes (set `SERIES`): `maths`, `science`, `safe`, `teen`, `study`, `engl
 | `publish/captions.py` | Writes `out/vNNN_*_caption.txt` next to each MP4 for copy-paste |
 | `fonts/` | Fonts used by the renderer |
 
+## Automatic rendering
+
+`auto_render.ps1` pulls the latest scripts from GitHub, renders only the ones that have no MP4 yet
+(`render.py --new`) and writes the caption files (`publish/captions.py`). The log is
+`work/auto_render.log`. Run it by hand with
+`powershell -ExecutionPolicy Bypass -File auto_render.ps1`.
+
+A Windows Task Scheduler task, `KyunAurKaiseRender`, runs it daily at 06:30 (after the cloud batch).
+The PC must be on. To recreate it:
+
+```
+schtasks /Create /TN "KyunAurKaiseRender" /SC DAILY /ST 06:30 /TR "powershell -ExecutionPolicy Bypass -File D:\kyun-aur-kaise-reels\auto_render.ps1"
+```
+
+It only finds new scripts once the daily cloud run can push to GitHub (the Claude GitHub App needs
+access to this repo).
+
 ## Daily batches
 
 `CLAUDE.md` has the full daily procedure: four new topics from four different series, researched
